@@ -26,68 +26,65 @@ BROWSER := python -c "$$BROWSER_PYSCRIPT"
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test ## 清除所有build, test等等的遗留
 
-clean-build: ## remove build artifacts
+clean-build: ## 清除build遗留
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
 
-clean-pyc: ## remove Python file artifacts
+clean-pyc: ## 清除.pyc .pyo等等
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
-clean-test: ## remove test and coverage artifacts
+clean-test: ## 清除测试遗留
 	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint: ## check style with flake8
-	flake8 {{ cookiecutter.project_slug }} tests
+lint: ## flake8检测代码风格
+	flake8 xacs tests
 
-test: ## run tests quickly with the default Python
-{%- if cookiecutter.use_pytest == 'y' %}
+test: ## 快速测试代码
 	pytest
-{%- else %}
-	python setup.py test
-{%- endif %}
 
-test-all: ## run tests on every Python version with tox
+test-all: ## 使用各个版本的Python测试代码
 	tox
 
-coverage: ## check code coverage quickly with the default Python
-{%- if cookiecutter.use_pytest == 'y' %}
-	coverage run --source {{ cookiecutter.project_slug }} -m pytest
-{%- else %}
-	coverage run --source {{ cookiecutter.project_slug }} setup.py test
-{%- endif %}
+coverage: ## 生成代码覆盖报告
+	coverage run --source xacs -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/{{ cookiecutter.project_slug }}.rst
+docs: ## 生成 Sphinx HTML 文档, 包括 API 文档
+	rm -f docs/xacs.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ {{ cookiecutter.project_slug }}
+	sphinx-apidoc -o docs/ xacs
+	rm -f docs/xacs.cli.rst
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
-servedocs: docs ## compile the docs watching for changes
+servedocs: docs ## 编译文档并查看变更
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-release: dist ## package and upload a release
-	twine upload dist/*
+release: dist ## 发布到pypi
+	python -m twine upload dist/*
 
-dist: clean ## builds source and wheel package
+dist: clean ## 构建Python包
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
 
-install: clean ## install the package to the active Python's site-packages
+install: clean ## 安装Python包
 	python setup.py install
+
+write-dep: ## 依赖包写到文件（先激活venv）
+	 echo " -i https://mirrors.aliyun.com/pypi/simple/" > requirements.txt
+	 pip3 freeze >> requirements.txt
