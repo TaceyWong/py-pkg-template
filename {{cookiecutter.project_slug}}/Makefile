@@ -87,4 +87,4 @@ install: clean ## 安装Python包
 
 write-dep: ## 依赖包写到文件（先激活venv）
 	 echo " -i https://mirrors.aliyun.com/pypi/simple/" > requirements.txt
-	 pip3 freeze >> requirements.txt
+	 pip3 freeze >> requirements.txt~
