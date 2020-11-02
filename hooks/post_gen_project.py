@@ -20,3 +20,6 @@ if __name__ == '__main__':
 
     if 'Not open source' == '{{ cookiecutter.open_source_license }}':
         remove_file('LICENSE')
+
+    if '{{ cookiecutter.add_flake8_config_file }}' != 'y':
+        remove_file('.flake8')
